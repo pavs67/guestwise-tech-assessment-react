@@ -154,7 +154,7 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
                     name="name"
                     value={params.name}
                     onChange={handleInputChange}
-                    className={`${errorCss("name", errors)}`}
+                    className={`form-control ${errorCss("name", errors)}`}
                   />
                   <ErrorMessage field="name" errors={errors} />
                 </div>
@@ -168,7 +168,7 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
                     name="email"
                     value={params.email}
                     onChange={handleInputChange}
-                    className={`${errorCss("email", errors)}`}
+                    className={`form-control ${errorCss("email", errors)}`}
                   />
                   <ErrorMessage field="email" errors={errors} />
                 </div>
@@ -183,7 +183,7 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
                     value={params.phone}
                     onChange={handleInputChange}
                     onBlur={handlePhoneBlur}
-                    className={`${errorCss("phone", errors)}`}
+                    className={`form-control ${errorCss("phone", errors)}`}
                   />
                   <ErrorMessage field="phone" errors={errors} />
                 </div>
@@ -198,7 +198,7 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
                     selected={params.date}
                     dateFormat="dd/MM/yyyy"
                     onSelect={(date) => handleUpdateState("date", date)}
-                    className={`${errorCss("date", errors)}`}
+                    className={`form-control ${errorCss("date", errors)}`}
                   />
 
                   <ErrorMessage field="date" errors={errors} />
@@ -216,7 +216,7 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
                     }
                     selectedDate={params.date}
                     selectedTime={params.time}
-                    className={`${errorCss("time", errors)}`}
+                    className={`form-control ${errorCss("time", errors)}`}
                     handleChange={(val) => handleUpdateState("time", val)}
                   />
 
@@ -230,6 +230,7 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
                   <select
                     name="guests"
                     id="guests"
+                    className="form-control"
                     value={params.guests}
                     onChange={(e) => handleUpdateState("guests", Number(e.target.value))}
                   >
@@ -254,8 +255,8 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
                 )}
               </div>
 
-              <button type="submit" className="" disabled={loading}>
-                {loading ? "loading" : "Book"}
+              <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+                {loading ? "loading" : "Create booking"}
               </button>
 
               {submitError && <div>There was an error, please try again.</div>}

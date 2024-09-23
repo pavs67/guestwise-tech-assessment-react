@@ -74,24 +74,30 @@ function App() {
                   type="search"
                   value={searchTerm}
                   placeholder="Search"
+                  className="form-control"
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
 
               <div className="mb-3 d-flex">
-                <label htmlFor="sortBy" className="me-3">
-                  Sort by:
-                </label>
-                <select
-                  name="sort"
-                  value={selectedSort}
-                  onChange={(e) => handleSort(e.target.value)}
-                  id="sortBy"
-                >
-                  <option value="">Select an option</option>
-                  <option value="name">Name</option>
-                  <option value="rating">Rating</option>
-                </select>
+                <div className="form-group">
+                  <label htmlFor="sortBy" className="me-3">
+                    Sort by:
+                  </label>
+                  <div className="">
+                    <select
+                      className="form-control"
+                      name="sort"
+                      value={selectedSort}
+                      onChange={(e) => handleSort(e.target.value)}
+                      id="sortBy"
+                    >
+                      <option value="">Select an option</option>
+                      <option value="name">Name</option>
+                      <option value="rating">Rating</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
 
