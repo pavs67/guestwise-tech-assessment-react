@@ -9,8 +9,9 @@ import RestaurantDetails from "./components/RestaurantDetails";
 import RestaurantList from "./components/RestaurantList";
 
 function App() {
-  const { restaurants, getRestaurants, restaurantsLoading } = useGetRestaurants();
-  const { restaurant, getRestaurantById, restaurantLoading } = useGetRestaurantDetails();
+  const { restaurants, getRestaurants, restaurantsLoading, restaurantsError } = useGetRestaurants();
+  const { restaurant, getRestaurantById, restaurantLoading, restaurantError } =
+    useGetRestaurantDetails();
 
   const [displayedRestaurants, setDisplayedRestaurants] = useState<IRestaurant[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,17 +100,19 @@ function App() {
                 loading={restaurantsLoading}
                 restaurants={displayedRestaurants}
                 handleSelectRestaurant={handleSelectRestaurant}
+                restaurantsError={restaurantsError}
               />
             </div>
           </Col>
 
           <Col md={8}>
-            {restaurantLoading && "Loading"}
-            {!restaurantLoading && restaurant && (
-              <div className="">
-                <RestaurantDetails restaurant={restaurant} />
-              </div>
-            )}
+            <div className="">
+              <RestaurantDetails
+                restaurantError={restaurantError}
+                restaurantLoading={restaurantLoading}
+                restaurant={restaurant}
+              />
+            </div>
           </Col>
         </Row>
       </Container>

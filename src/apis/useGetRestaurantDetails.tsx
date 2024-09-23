@@ -18,17 +18,20 @@ export const useGetRestaurantDetails = () => {
           "Content-Type": "application/json; charset=utf-8",
         },
         signal: cont?.signal,
+        timeout: 5000,
       });
 
       if (res.status === 200) {
         setRestaurant(res.data);
       } else {
+        setRestaurantError("Oops! There was an error loading the restaurant details");
         setRestaurant(null);
       }
 
       setRestaurantLoading(false);
     } catch (error) {
-      // setRestaurantsError(error);
+      setRestaurantError("Oops! There was an error loading the restaurant details");
+      setRestaurantLoading(false);
       setRestaurant(null);
     }
   };

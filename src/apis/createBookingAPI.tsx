@@ -14,4 +14,5 @@ export const createBookingAPI = async (data: {
     method: "POST",
     url: `http://localhost:3001/bookings`,
     data: data,
+    timeout: 5000,
   });

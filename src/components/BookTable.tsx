@@ -30,6 +30,7 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
   const [loading, setLoading] = useState(false);
 
   const [formComplete, setFormComplete] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -127,8 +128,12 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
       if (res.status === 201) {
         setLoading(false);
         setFormComplete(true);
+      } else {
+        setLoading(false);
+        setSubmitError(true);
       }
     } catch (error) {
+      setSubmitError(true);
       setLoading(false);
     }
   };
@@ -252,6 +257,8 @@ const BookTable: FC<BookTableProps> = ({ restaurant }) => {
               <button type="submit" className="" disabled={loading}>
                 {loading ? "loading" : "Book"}
               </button>
+
+              {submitError && <div>There was an error, please try again.</div>}
             </form>
           </div>
         ) : (

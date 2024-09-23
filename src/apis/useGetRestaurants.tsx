@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { isCancel } from "axios";
 import { useState } from "react";
 
 export type IRestaurant = {
@@ -35,18 +35,22 @@ export const useGetRestaurants = () => {
           "Content-Type": "application/json; charset=utf-8",
         },
         signal: cont?.signal,
+        timeout: 5000,
       });
 
       if (res.status === 200) {
         setRestaurants(res.data);
       } else {
         setRestaurants([]);
+        setRestaurantsError("Oops! There was an error loading restaurants");
       }
 
       setRestaurantsLoading(false);
     } catch (error) {
-      // setRestaurantsError(error);
-      setRestaurants([]);
+      if (!isCancel(error)) {
+        setRestaurantsError("Oops! There was an error loading restaurants");
+        setRestaurants([]);
+      }
     }
   };
 
