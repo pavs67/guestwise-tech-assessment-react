@@ -1,52 +1,273 @@
-import React from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
+import { IRestaurant } from "../apis/useGetRestaurants";
+import useErrors, { errorCss, ErrorMessage, scrollToError } from "../hooks/useErrors";
+import { createBookingAPI } from "../apis/createBookingAPI";
+import { validPhone } from "../functions/validation";
+import DatePicker from "react-datepicker";
+import moment from "moment";
+import TimeSelect from "./TimeSelect";
+import { isWeekday } from "../functions/dates";
 
-const BookTable: React.FC = ({}) => {
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+interface BookTableProps {
+  restaurant: IRestaurant;
+}
+
+const defaultParams = {
+  name: "",
+  email: "",
+  phone: "",
+  date: new Date(),
+  time: "",
+  guests: 2,
+};
+
+const BookTable: FC<BookTableProps> = ({ restaurant }) => {
+  const { errors, handleUpdateErrors } = useErrors();
+  const [params, setParams] = useState(defaultParams);
+
+  const [validate, setValidate] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [formComplete, setFormComplete] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      setParams(defaultParams);
+      setFormComplete(false);
+    };
+  }, [restaurant]);
+
+  useEffect(() => {
+    if (validate) {
+      setValidate(false);
+
+      if (errors.length > 0) {
+        scrollToError();
+      } else if (
+        params.name !== "" &&
+        params.email !== "" &&
+        params.phone !== "" &&
+        params.time !== "" &&
+        params.time !== null &&
+        params.guests >= 1 &&
+        params.guests < 13
+      ) {
+        handleSave();
+      }
+    }
+  }, [validate, errors]);
+
+  const handleUpdateState = (field: string, value: any) => {
+    handleUpdateErrors("remove", field);
+
+    setParams((curr: any) => {
+      return { ...curr, [field]: value };
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.currentTarget;
+
+    handleUpdateState(name, value);
+  };
+
+  const handleValidate = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (params.name === "") {
+      handleUpdateErrors("add", "name", "Please enter name");
+    }
+
+    if (params.email === "") {
+      handleUpdateErrors("add", "email", "Please enter your email");
+    }
+
+    if (params.phone === "") {
+      handleUpdateErrors("add", "phone", "Please enter your mobile number");
+    }
+
+    if (params.time === "") {
+      handleUpdateErrors("add", "time", "Please select a time");
+    }
+
+    if (params.phone !== "" && !validPhone(params.phone)) {
+      handleUpdateErrors("add", "phone", "Please enter a valid mobile number");
+    }
+
+    if (params.guests > 12) {
+      handleUpdateErrors("add", "guests", "");
+    }
+
+    setValidate(true);
+  };
+
+  const handlePhoneBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (validPhone(e.currentTarget.value)) {
+      handleUpdateErrors("remove", e.currentTarget.name);
+    } else {
+      handleUpdateErrors("add", e.currentTarget.name, "Please enter a valid mobile number");
+    }
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+
     try {
-      const response = await fetch("http://localhost:3001/bookings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({}),
+      const res = await createBookingAPI({
+        name: params.name,
+        email: params.email,
+        guests: params.guests,
+        time: params.time,
+        phone: params.phone,
+        date: params.date,
+        restaurantId: restaurant.id,
       });
 
-      if (!response.ok) throw new Error("Booking failed");
-
-      console.log("Booking successful");
-    } catch (err) {
-      console.log(err);
-    } finally {
-      console.log("Completed request");
+      if (res.status === 201) {
+        setLoading(false);
+        setFormComplete(true);
+      }
+    } catch (error) {
+      setLoading(false);
     }
   };
 
   return (
     <Container>
-      <h2>Book a Table</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Name</label>
-        <input type="text" id="name" name="name" />
-        <br />
-        <label htmlFor="email">Email</label>
-        <input type="email" id="email" name="email" />
-        <br />
-        <label htmlFor="phone">Phone</label>
-        <input type="tel" id="phone" name="phone" />
-        <br />
-        <label htmlFor="date">Date</label>
-        <input type="date" id="date" name="date" />
-        <br />
-        <label htmlFor="time">Time</label>
-        <input type="time" id="time" name="time" />
-        <br />
-        <label htmlFor="guests">Guests</label>
-        <input type="number" id="guests" name="guests" />
-        <br />
-        <button type="submit">Book</button>
-      </form>
+      <>
+        {!formComplete ? (
+          <div className="gw-booking-form">
+            <h2 className="gw-booking-form__title">Make a booking</h2>
+
+            <form onSubmit={handleValidate}>
+              <div className="form-group">
+                <label htmlFor="name">Name</label>
+                <div className="">
+                  <input
+                    type="text"
+                    name="name"
+                    value={params.name}
+                    onChange={handleInputChange}
+                    className={`${errorCss("name", errors)}`}
+                  />
+                  <ErrorMessage field="name" errors={errors} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <div className="">
+                  <input
+                    type="email"
+                    name="email"
+                    value={params.email}
+                    onChange={handleInputChange}
+                    className={`${errorCss("email", errors)}`}
+                  />
+                  <ErrorMessage field="email" errors={errors} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="phone">Phone</label>
+                <div className="">
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={params.phone}
+                    onChange={handleInputChange}
+                    onBlur={handlePhoneBlur}
+                    className={`${errorCss("phone", errors)}`}
+                  />
+                  <ErrorMessage field="phone" errors={errors} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="date">Date</label>
+
+                <div className="">
+                  <DatePicker
+                    minDate={new Date()}
+                    selected={params.date}
+                    dateFormat="dd/MM/yyyy"
+                    onSelect={(date) => handleUpdateState("date", date)}
+                    className={`${errorCss("date", errors)}`}
+                  />
+
+                  <ErrorMessage field="date" errors={errors} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="time">Time</label>
+                <div className="">
+                  <TimeSelect
+                    timeRange={
+                      isWeekday(params.date)
+                        ? restaurant.details.openingHours.weekday
+                        : restaurant.details.openingHours.weekend
+                    }
+                    selectedDate={params.date}
+                    selectedTime={params.time}
+                    className={`${errorCss("time", errors)}`}
+                    handleChange={(val) => handleUpdateState("time", val)}
+                  />
+
+                  <ErrorMessage field="time" errors={errors} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="guests">No. of diners</label>
+                <div className="">
+                  <select
+                    name="guests"
+                    id="guests"
+                    value={params.guests}
+                    onChange={(e) => handleUpdateState("guests", Number(e.target.value))}
+                  >
+                    {Array.from({ length: 13 }, (v, i) => i + 1).map((people) => (
+                      <option key={people} value={people}>
+                        {people === 13 ? "12+" : people} {people === 1 ? "person" : "people"}{" "}
+                      </option>
+                    ))}
+                  </select>
+
+                  <ErrorMessage field="guests" errors={errors} />
+                </div>
+
+                {params.guests > 12 && (
+                  <div>
+                    If you have more than 12 guests please{" "}
+                    <a href={`mailto:${restaurant.details.contactEmail}`}>
+                      contact us to place a booking
+                    </a>
+                    .
+                  </div>
+                )}
+              </div>
+
+              <button type="submit" className="" disabled={loading}>
+                {loading ? "loading" : "Book"}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="gw-booking-complete">
+            <h3>You're all set!</h3>
+            <p>Your booking details:</p>
+
+            <div>Name: {params.name}</div>
+            <div>Email: {params.email}</div>
+            <div>
+              Time: {moment(params.date).format("DD/MM/YYYY")} {params.time}
+            </div>
+            <div>No. of diners: {params.guests}</div>
+          </div>
+        )}
+      </>
     </Container>
   );
 };
