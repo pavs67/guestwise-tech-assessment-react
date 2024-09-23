@@ -1,7 +1,7 @@
 {
   "restaurants": [
     {
-      "id": "1",
+      "id": 1,
       "name": "Velvet & Vine",
       "shortDescription": "A fine dining experience with a modern twist.",
       "cuisine": "French",
@@ -18,7 +18,7 @@
       }
     },
     {
-      "id": "2",
+      "id": 2,
       "name": "Sushi Paradise",
       "shortDescription": "Traditional sushi and modern fusion rolls.",
       "cuisine": "Japanese",
