@@ -2,10 +2,10 @@ import axios from "axios";
 import { useState } from "react";
 import { IRestaurant } from "./useGetRestaurants";
 
-export const useGetRestaurantById = () => {
-  const [restaurantLoading, setRestaurantLoading] = useState(true);
+export const useGetRestaurantDetails = () => {
+  const [restaurantLoading, setRestaurantLoading] = useState(false);
   const [restaurantError, setRestaurantError] = useState("");
-  const [restaurant, setRestaurant] = useState<IRestaurant[]>([]);
+  const [restaurant, setRestaurant] = useState<IRestaurant | null>(null);
 
   const getRestaurantById = async (id: number, cont?: AbortController) => {
     setRestaurantLoading(true);
@@ -23,13 +23,13 @@ export const useGetRestaurantById = () => {
       if (res.status === 200) {
         setRestaurant(res.data);
       } else {
-        setRestaurant([]);
+        setRestaurant(null);
       }
 
       setRestaurantLoading(false);
     } catch (error) {
       // setRestaurantsError(error);
-      setRestaurant([]);
+      setRestaurant(null);
     }
   };
 

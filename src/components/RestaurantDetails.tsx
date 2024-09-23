@@ -1,46 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, Container } from "react-bootstrap";
-import { getRestaurantDetails } from "../services/api";
+import { IRestaurant } from "../apis/useGetRestaurants";
+import BookTable from "./BookTable";
 
 type RestaurantDetailsProps = {
-  restaurantId: number;
+  restaurant: IRestaurant;
 };
 
-type RestaurantDetailsData = {
-  address: string;
-  openingHours: {
-    weekday: string;
-    weekend: string;
-  };
-  reviewScore: number;
-  contactEmail: string;
-};
-
-const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({
-  restaurantId,
-}) => {
-  if (!restaurantId) return null;
-
-  const details = {
-    address: "123 Fine St, London",
-    openingHours: {
-      weekday: "12:00 PM - 10:00 PM",
-      weekend: "11:00 AM - 11:00 PM",
-    },
-    reviewScore: 4.7,
-    contactEmail: "info@velvetandvine.co.uk",
-  };
-
+const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ restaurant }) => {
   return (
     <Container>
-      <Card>
-        <Card.Body>
-          <Card.Title>Restaurant Details</Card.Title>
-          <Card.Text>Address: {details.address}</Card.Text>
-          <Card.Text>Review Score: {details.reviewScore}</Card.Text>
-          <Card.Text>Contact: {details.contactEmail}</Card.Text>
-        </Card.Body>
-      </Card>
+      <div className="gw-restaurant-details">
+        <Card>
+          <Card.Body>
+            <Card.Title>{restaurant.name}</Card.Title>
+            <Card.Text>Address: {restaurant.details.address}</Card.Text>
+            <Card.Text>Review Score: {restaurant.details.reviewScore}</Card.Text>
+            <Card.Text>
+              Opening Times: <br />
+              Mon-Fri: {restaurant.details.openingHours.weekday} <br />
+              Sat-Sun: {restaurant.details.openingHours.weekend}
+            </Card.Text>
+            <Card.Text>
+              Contact:{" "}
+              <a href={`mailto:${restaurant.details.contactEmail}`}>
+                {restaurant.details.contactEmail}
+              </a>
+            </Card.Text>
+          </Card.Body>
+        </Card>
+
+        <BookTable restaurant={restaurant} />
+      </div>
     </Container>
   );
 };
