@@ -7,6 +7,7 @@ import { IRestaurant, useGetRestaurants } from "./apis/useGetRestaurants";
 import "./App.scss";
 import RestaurantDetails from "./components/RestaurantDetails";
 import RestaurantList from "./components/RestaurantList";
+import { sortByName, sortByRating } from "./functions/helpers";
 
 function App() {
   const { restaurants, getRestaurants, restaurantsLoading, restaurantsError } = useGetRestaurants();
@@ -48,12 +49,10 @@ function App() {
 
     switch (sort) {
       case "name":
-        setDisplayedRestaurants(
-          restaurants.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
-        );
+        setDisplayedRestaurants(sortByName(restaurants));
         break;
       case "rating":
-        setDisplayedRestaurants(restaurants.sort((a, b) => b.rating - a.rating));
+        setDisplayedRestaurants(sortByRating(restaurants));
         break;
 
       default:
